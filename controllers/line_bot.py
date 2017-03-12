@@ -13,6 +13,8 @@ from google.appengine.api import memcache
 import datetime
 from argeweb.components.pagination import Pagination
 from argeweb.components.search import Search
+from argeweb.libs import requests
+from argeweb.libs.bs4 import BeautifulSoup
 from ..models.line_bot_config_model import LineBotConfigModel
 
 from ..libs.linebot import (
@@ -22,8 +24,8 @@ from ..libs.linebot.exceptions import (
     InvalidSignatureError
 )
 from ..libs.linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage, JoinEvent, LeaveEvent, FollowEvent, UnfollowEvent,
-    StickerMessage, BeaconEvent, PostbackEvent
+    MessageEvent, JoinEvent, LeaveEvent, FollowEvent, UnfollowEvent, StickerMessage, BeaconEvent, PostbackEvent,
+    ImageSendMessage, TextMessage, TextSendMessage
 )
 
 
@@ -60,14 +62,16 @@ class LineBot(Controller):
 
         # if event is MessageEvent and message is TextMessage, then echo text
         for event in events:
-            return_message = None
             search_item = None
+            return_text = None
+            return_original_content_url = None
+            return_preview_image_url = None
             if isinstance(event, JoinEvent):
-                return_message = config.join_event_message
+                return_text = config.join_event_message
             if isinstance(event, LeaveEvent):
                 pass
             if isinstance(event, FollowEvent):
-                return_message = config.follow_event_message
+                return_text = config.follow_event_message
             if isinstance(event, UnfollowEvent):
                 pass
             if isinstance(event, StickerMessage):
@@ -78,10 +82,9 @@ class LineBot(Controller):
                 pass
             if isinstance(event, MessageEvent) and isinstance(event.message, TextMessage):
                 user_message = event.message.text
-                keyword = event.message.text + u' AND (message_type = %s ) AND (source_type = %s)' % (event.type, event.source.type)
+                keyword = event.message.text + u' AND (message_type = %s ) AND (source_type = %s)  OR (source_type = all)' % (event.type, event.source.type)
                 self.logging.info(keyword)
                 search_list = self.components.search('auto_ix_LineBotModel', keyword)
-            self.logging.info(search_list)
             if len(search_list) > 0:
                 search_item = search_list[0]
             if search_item:
@@ -90,12 +93,18 @@ class LineBot(Controller):
                 line_event = event
                 exec search_item.py_code
 
-                self.logging.info(return_message)
+                self.logging.info(return_text)
                 if search_item.return_message_type == u'TextSendMessage':
-                    if return_message and not return_message.strip() == u'':
+                    if return_text and not return_text.strip() == u'':
                         line_bot_api.reply_message(
                             event.reply_token,
-                            TextSendMessage(text=return_message)
+                            TextSendMessage(text=return_text)
                         )
-
+                if search_item.return_message_type == u"ImageSendMessage":
+                    if return_original_content_url and return_preview_image_url:
+                        line_bot_api.reply_message(
+                            event.reply_token, ImageSendMessage(
+                                original_content_url=return_original_content_url,
+                                preview_image_url=return_preview_image_url
+                            ))
         return 'OK'
