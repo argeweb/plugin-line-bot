@@ -16,7 +16,7 @@ class LineBotConfig(Controller):
         components = (scaffold.Scaffolding, Pagination, Search)
 
     @route
-    @route_menu(list_name=u'backend', text=u'Line Bot 設定', sort=801, group=u'互動項目')
+    @route_menu(list_name=u'backend', text=u'Line Bot 設定', sort=802, group=u'互動項目')
     def admin_config(self):
         record = self.meta.Model.find_by_name(self.namespace)
         if record is None:

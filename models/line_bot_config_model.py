@@ -12,9 +12,13 @@ from argeweb import Fields
 
 class LineBotConfigModel(BasicModel):
     name = Fields.StringProperty(verbose_name=u'系統編號')
-    title = Fields.StringProperty(default=u'Line Bot 名稱', verbose_name=u'Line Bot 名稱')
-    channel_secret = Fields.StringProperty(default=u'', verbose_name=u'channel_secret')
-    channel_access_token = Fields.StringProperty(default=u'', verbose_name=u'channel_access_token')
+    title = Fields.StringProperty(verbose_name=u'Line Bot 名稱', default=u'Arge')
+    channel_secret = Fields.StringProperty(verbose_name=u'channel_secret', default=u'')
+    channel_access_token = Fields.StringProperty(verbose_name=u'channel_access_token', default=u'')
+    unknown_message = Fields.StringProperty(verbose_name=u'無法判斷時', default=u'')
+    join_event_message = Fields.StringProperty(verbose_name=u'JoinEvent', default=u'')
+    follow_event_message = Fields.StringProperty(verbose_name=u'FollowEvent', default=u'')
+
 
     @classmethod
     def find_or_create_by_name(cls, name):

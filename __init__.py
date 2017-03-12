@@ -16,6 +16,10 @@ plugins_helper = {
         'line_bot': {
             'group': u'Line Bot',
             'actions': [
+                {'action': 'list', 'name': u'Line Bot 訊息'},
+                {'action': 'add', 'name': u'新增訊息'},
+                {'action': 'edit', 'name': u'編輯訊息'},
+                {'action': 'view', 'name': u'檢視訊息'},
                 {'action': 'plugins_check', 'name': u'啟用停用模組'},
             ]
         }

@@ -13,7 +13,7 @@ from google.appengine.api import memcache
 import datetime
 from argeweb.components.pagination import Pagination
 from argeweb.components.search import Search
-from argparse import ArgumentParser
+from ..models.line_bot_config_model import LineBotConfigModel
 
 from ..libs.linebot import (
     LineBotApi, WebhookParser
@@ -33,14 +33,17 @@ class LineBot(Controller):
         pagination_limit = 50
 
     class Scaffold:
-        display_in_list = ('site_name', 'domain_expiration_date',
-                                      'space_expiration_date', 'contact_person',
-                                      'contact_telephone', 'contact_mobile', 'host',)
+        display_in_list = ['title', 'source_type', 'message_type', 'return_message_type', 'py_code']
 
     @route
-    @route_menu(list_name=u'backend', text=u'Line callback Test', sort=999999, need_hr=True)
+    @route_menu(list_name=u'backend', text=u'Line Bot 訊息', sort=801, group=u'互動項目')
+    def admin_list(self):
+        return scaffold.list(self)
+
+    @route
+    @route_menu(list_name=u'backend', text=u'Line callback Test', sort=803, group=u'互動項目')
     def callback(self):
-        config = self.meta.Model.find_or_create_by_name(self.namespace)
+        config = LineBotConfigModel.find_or_create_by_name(self.namespace)
         line_bot_api = LineBotApi(config.channel_access_token)
         parser = WebhookParser(config.channel_secret)
         signature = self.request.headers['X-Line-Signature']
@@ -57,27 +60,42 @@ class LineBot(Controller):
 
         # if event is MessageEvent and message is TextMessage, then echo text
         for event in events:
-            rn = None
+            return_message = None
+            search_item = None
             if isinstance(event, JoinEvent):
-                rn = u"我來了"
+                return_message = config.join_event_message
             if isinstance(event, LeaveEvent):
-                rn = u"再會"
+                pass
             if isinstance(event, FollowEvent):
-                rn = u"解開束縛"
+                return_message = config.follow_event_message
             if isinstance(event, UnfollowEvent):
-                rn = u"不~~別鎖我"
+                pass
             if isinstance(event, StickerMessage):
-                rn = u"StickerMessage"
+                pass
             if isinstance(event, BeaconEvent):
-                rn = u"BeaconEvent"
+                pass
             if isinstance(event, PostbackEvent):
-                rn = u"PostbackEvent"
+                pass
             if isinstance(event, MessageEvent) and isinstance(event.message, TextMessage):
-                rn = event.message.text[::-1]
-            if rn:
-                line_bot_api.reply_message(
-                    event.reply_token,
-                    TextSendMessage(text=rn)
-                )
+                user_message = event.message.text
+                keyword = event.message.text + u' AND (message_type = %s ) AND (source_type = %s)' % (event.type, event.source.type)
+                self.logging.info(keyword)
+                search_list = self.components.search('auto_ix_LineBotModel', keyword)
+            self.logging.info(search_list)
+            if len(search_list) > 0:
+                search_item = search_list[0]
+            if search_item:
+                self.logging.info(search_item)
+                line_body = body
+                line_event = event
+                exec search_item.py_code
+
+                self.logging.info(return_message)
+                if search_item.return_message_type == u'TextSendMessage':
+                    if return_message and not return_message.strip() == u'':
+                        line_bot_api.reply_message(
+                            event.reply_token,
+                            TextSendMessage(text=return_message)
+                        )
 
         return 'OK'
