@@ -4,13 +4,13 @@
 
 Line 訊息回覆機器人
 
-py code 範例
 回傳的參數為 "return_" + LINE API 原參數名稱
 如 
 
     text  =>  return_text
     original_content_url  =>  return_original_content_url
 
+py code 範例
 來自 https://github.com/twtrubiks/line-bot-tutorial
 
 蘋果日報
