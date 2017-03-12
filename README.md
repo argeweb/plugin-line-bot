@@ -1,5 +1,17 @@
 "# plugin-line-bot
 
+此為 ArgeWeb 開發框架之套件，請使用先下載 https://github.com/argeweb/start
+
+相關的安裝方式，請見 argeweb/start 的 README
+
+再使用 manage.py 進行安裝
+
+    manage.py install argeweb/plugin-line-bot
+
+目前有打包一個立即可用的版本，位於 https://github.com/argeweb/plugin-line-bot/releases 裡的 argeweb-line-bot-quick.zip
+
+後台設定畫面
+
 <img src="https://lh3.googleusercontent.com/fUiX2JsPmnEXqLFWOHdkY2wMZrEAe4WTKx-pT4ZP0ApagTsmuGvNW7_5TMvvblqiFkkSc6fjtnHC6_kZJIUXgB4EYsTmRntiDmdGW6jbymVQFhHrV31tf_6y5WnXvqOoBqGndGhEyQBdREky8egfKESXxD8wv2ghTClHteBdJxMt1Ce0kMyAWBPWm4DJ5i4sDJ-oFoeZ1TJo_ZdywRIXt-sMD-aER4r03k-vE4iaQndTRRHnnLMebN_E4beNNuPOQFktxd1X2w8dazZLgirojaYmCsOk9FOYBk5JHiLC-kbkmT5s-PFA0Ht5ZmZbV4hc4LdBgkWqFkQ4VQHl6d4DM_liQkqvjZjDFJLjq55SIHA-q2anhfmqy9wxVVre1ZO1kj3I67YRvUPu2XTv9B8GSizQOdJ7e2jIxS5OI8-Q3n-Y1JwMm9onRKsmu6dS9gW44YDROvsvRvUMhmp1-BSwz24JOpv9NmLaIcnrDQsyBhdn8FgtRkhDe9jNbMga1Y3ONUpkcUdKV584Jt9snEI0GUz6CLQr2wVHVqRkDN01CyZIkPz_KZi81c2QPtQY45DzjedesaHhrZN-hCA3po8tZeOKC5yqiRCh7XXqTVs6vibRWTLEZF-VUw=w1910-h930-no" />
 
 Line 訊息回覆機器人
