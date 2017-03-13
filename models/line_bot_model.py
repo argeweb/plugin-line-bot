@@ -13,10 +13,10 @@ from argeweb import Fields
 class LineBotModel(BasicModel):
     name = Fields.HiddenProperty(verbose_name=u'系統編號')
     title = Fields.TextProperty(verbose_name=u'檢查的字串', default=u'')
+    py_code = Fields.TextProperty(verbose_name=u'PyCode', default=u'')
     source_type = Fields.StringProperty(verbose_name=u'要處理的訊息來源', default=u'user')
     message_type = Fields.StringProperty(verbose_name=u'要處理的訊息類型', default=u'message')
-    return_message_type = Fields.StringProperty(verbose_name=u'回傳的訊息類型', default=u'TextSendMessage',)
-    py_code = Fields.TextProperty(verbose_name=u'PyCode', default=u'')
+    return_message_type = Fields.StringProperty(verbose_name=u'回傳的訊息類型', default=u'TextSendMessage')
 
     @classmethod
     def find_or_create_by_name(cls, name):

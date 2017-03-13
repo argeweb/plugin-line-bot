@@ -16,6 +16,7 @@ from argeweb.components.search import Search
 from argeweb.libs import requests
 from argeweb.libs.bs4 import BeautifulSoup
 from ..models.line_bot_config_model import LineBotConfigModel
+from ..models.line_bot_input_model import LineBotInputModel, wait_input
 from ..libs.linebot import LineBotApi, WebhookParser
 from ..libs.linebot.exceptions import InvalidSignatureError
 from ..libs.linebot.models import *
@@ -75,14 +76,21 @@ class LineBot(Controller):
                 pass
             if isinstance(event, PostbackEvent):
                 postback_data = event.postback.data
-                keyword = u'title = (%s) AND (message_type = %s) AND (source_type = user)' % (postback_data, event.type)
+                keyword = u'title = (%s) AND (message_type = %s) AND (source_type = %s)' % (postback_data, event.type, event.source.type)
                 search_list = self.components.search('auto_ix_LineBotModel', keyword)
             if isinstance(event, MessageEvent) and isinstance(event.message, TextMessage):
                 user_message = event.message.text
-                keyword = u'title = (%s) AND (message_type = %s) AND (source_type = %s)  OR (source_type = all)' % \
-                          (user_message, event.type, event.source.type)
+                input_item = LineBotInputModel.find_by_name(event.source.sender_id)
+                if input_item:
+                    keyword = u'title = (%s) AND (message_type = %s) AND (source_type = input)' % \
+                              (input_item.next_step, event.type)
+                    input_item.key.delete()
+                else:
+                    keyword = u'title = (%s) AND (message_type = %s) AND (source_type = %s)  OR (source_type = all)' % \
+                              (user_message, event.type, event.source.type)
                 search_list = self.components.search('auto_ix_LineBotModel', keyword)
-            self.logging.info(keyword)
+            if keyword:
+                self.logging.info(keyword)
             if len(search_list) > 0:
                 search_item = search_list[0]
             if search_item is None:
@@ -111,3 +119,4 @@ class LineBot(Controller):
             if reply_message:
                 line_bot_api.reply_message(event.reply_token, reply_message)
         return 'OK'
+
