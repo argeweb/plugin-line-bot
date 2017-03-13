@@ -60,12 +60,15 @@ class LineBot(Controller):
             return_template = None
             return_alt_text = None
             reply_message = None
+            start_event = False
             if isinstance(event, JoinEvent):
+                start_event = True
                 return_text = config.join_event_message
                 exec config.join_event_code
             if isinstance(event, LeaveEvent):
                 pass
             if isinstance(event, FollowEvent):
+                start_event = True
                 return_text = config.follow_event_message
                 exec config.follow_event_code
             if isinstance(event, UnfollowEvent):
@@ -99,7 +102,7 @@ class LineBot(Controller):
             line_body = body
             line_event = event
             exec search_item.py_code
-            if search_item.return_message_type == u'TextSendMessage':
+            if search_item.return_message_type == u'TextSendMessage' or start_event:
                 if return_text and not return_text.strip() == u'':
                     reply_message = TextSendMessage(
                         text=return_text
