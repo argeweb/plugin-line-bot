@@ -92,33 +92,36 @@ class LineBot(Controller):
                     keyword = u'title = (%s) AND (message_type = %s) AND (source_type = %s)  OR (source_type = all)' % \
                               (user_message, event.type, event.source.type)
                 search_list = self.components.search('auto_ix_LineBotModel', keyword)
-            if keyword:
-                self.logging.info(keyword)
-            if len(search_list) > 0:
+            if search_list and len(search_list) > 0:
                 search_item = search_list[0]
-            if search_item is None:
+            if search_item is None and start_event is False:
                 continue
             self.logging.info(search_item)
             line_body = body
             line_event = event
-            exec search_item.py_code
-            if search_item.return_message_type == u'TextSendMessage' or start_event:
+            return_message_type = u'TextSendMessage'
+            if search_item is not None:
+                return_message_type = search_item.return_message_type
+                exec search_item.py_code
+            if return_message_type == u'TextSendMessage':
                 if return_text and not return_text.strip() == u'':
                     reply_message = TextSendMessage(
                         text=return_text
                     )
-            if search_item.return_message_type == u"ImageSendMessage":
+            if return_message_type == u"ImageSendMessage":
                 if return_original_content_url and return_preview_image_url:
                     reply_message = ImageSendMessage(
                         original_content_url=return_original_content_url,
                         preview_image_url=return_preview_image_url
                     )
-            if search_item.return_message_type == u"TemplateSendMessage":
+            if return_message_type == u"TemplateSendMessage":
                 if return_template:
                     reply_message = TemplateSendMessage(
                         alt_text=return_alt_text,
                         template=return_template
                     )
+            if start_event and reply_message is None and return_text and not return_text.strip() == u'':
+                reply_message = TextSendMessage(text=return_text)
             if reply_message:
                 line_bot_api.reply_message(event.reply_token, reply_message)
         return 'OK'
