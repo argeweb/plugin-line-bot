@@ -16,8 +16,10 @@ class LineBotConfigModel(BasicModel):
     channel_secret = Fields.StringProperty(verbose_name=u'channel_secret', default=u'')
     channel_access_token = Fields.StringProperty(verbose_name=u'channel_access_token', default=u'')
     unknown_message = Fields.StringProperty(verbose_name=u'無法判斷時', default=u'')
-    join_event_message = Fields.StringProperty(verbose_name=u'JoinEvent', default=u'')
-    follow_event_message = Fields.StringProperty(verbose_name=u'FollowEvent', default=u'')
+    join_event_message = Fields.StringProperty(verbose_name=u'JoinEventMessage', default=u'')
+    join_event_code = Fields.TextProperty(verbose_name=u'JoinEventCode', default=u'')
+    follow_event_message = Fields.StringProperty(verbose_name=u'FollowEventMessage', default=u'')
+    follow_event_code = Fields.TextProperty(verbose_name=u'FollowEventCode', default=u'')
 
 
     @classmethod

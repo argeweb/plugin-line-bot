@@ -264,10 +264,10 @@ class LineBotApi(object):
 
     @staticmethod
     def __check_error(response):
+        import logging
         if 200 <= response.status_code < 300:
             pass
         else:
-            import logging
-            logging.error(response.json)
+            logging.error(response.response.content)
             # error = Error.new_from_json_dict(response.json)
             # raise LineBotApiError(response.status_code, error)

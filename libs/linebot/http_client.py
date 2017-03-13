@@ -109,9 +109,12 @@ class RequestsHttpClient(HttpClient):
             timeout = self.timeout
         from argeweb.libs import requests
 
-        response = requests.get(
-            url, headers=headers, params=params, stream=stream, timeout=timeout
-        )
+        from google.appengine.api import urlfetch
+        result = urlfetch.fetch(url, params, "get", headers)
+        response = result
+        # response = requests.get(
+        #     url, headers=headers, params=params, stream=stream, timeout=timeout
+        # )
 
         return RequestsHttpResponse(response)
 
@@ -131,11 +134,16 @@ class RequestsHttpClient(HttpClient):
         """
         if timeout is None:
             timeout = self.timeout
+        # try:
         from argeweb.libs import requests
-        response = requests.post(
-            url, headers=headers, data=data, timeout=timeout
-        )
+        from google.appengine.api import urlfetch
+        result = urlfetch.fetch(url, data, "post", headers)
+        response = result
+        # response = requests.post(
+        #     url, headers=headers, data=data, timeout=timeout
+        # )
 
+        # except:
         return RequestsHttpResponse(response)
 
 
@@ -210,7 +218,8 @@ class RequestsHttpResponse(HttpResponse):
     @property
     def json(self):
         """Get request body as json-decoded."""
-        return self.response.json()
+        import json
+        return json.loads(self.response.content)
 
     def iter_content(self, chunk_size=1024, decode_unicode=False):
         """Get request body as iterator content (stream).

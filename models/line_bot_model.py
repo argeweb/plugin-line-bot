@@ -12,7 +12,7 @@ from argeweb import Fields
 
 class LineBotModel(BasicModel):
     name = Fields.HiddenProperty(verbose_name=u'系統編號')
-    title = Fields.StringProperty(verbose_name=u'檢查的字串', default=u'')
+    title = Fields.TextProperty(verbose_name=u'檢查的字串', default=u'')
     source_type = Fields.StringProperty(verbose_name=u'要處理的訊息來源', default=u'user')
     message_type = Fields.StringProperty(verbose_name=u'要處理的訊息類型', default=u'message')
     return_message_type = Fields.StringProperty(verbose_name=u'回傳的訊息類型', default=u'TextSendMessage',)
