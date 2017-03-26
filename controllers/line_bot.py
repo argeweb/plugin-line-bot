@@ -25,10 +25,9 @@ from ..libs.linebot.models import *
 class LineBot(Controller):
     class Meta:
         components = (scaffold.Scaffolding, Pagination, Search)
-        pagination_limit = 50
 
     class Scaffold:
-        display_in_list = ['title', 'source_type', 'message_type', 'return_message_type', 'py_code']
+        display_in_list = ['title', 'source_type', 'message_type', 'return_message_type', 'py_code', 'weights']
 
     @route
     @route_menu(list_name=u'backend', text=u'Line Bot 訊息', sort=801, group=u'互動項目')
@@ -60,49 +59,36 @@ class LineBot(Controller):
             return_template = None
             return_alt_text = None
             reply_message = None
-            start_event = False
-            if isinstance(event, JoinEvent):
-                start_event = True
-                return_text = config.join_event_message
-                exec config.join_event_code
-            if isinstance(event, LeaveEvent):
-                pass
-            if isinstance(event, FollowEvent):
-                start_event = True
-                return_text = config.follow_event_message
-                exec config.follow_event_code
-            if isinstance(event, UnfollowEvent):
-                pass
-            if isinstance(event, StickerMessage):
-                pass
-            if isinstance(event, BeaconEvent):
-                pass
-            if isinstance(event, PostbackEvent):
-                postback_data = event.postback.data
-                keyword = u'title = (%s) AND (message_type = %s) AND (source_type = %s)' % (postback_data, event.type, event.source.type)
-                search_list = self.components.search('auto_ix_LineBotModel', keyword)
-            if isinstance(event, MessageEvent) and isinstance(event.message, TextMessage):
+            keyword = ''
+            if event.type == 'message':
                 user_message = event.message.text
                 input_item = LineBotInputModel.find_by_name(event.source.sender_id)
                 if input_item:
                     keyword = u'title = (%s) AND (message_type = %s) AND (source_type = input)' % \
-                              (input_item.next_step, event.type)
+                              (input_item.next_step, event.message.type)
                     input_item.key.delete()
                 else:
                     keyword = u'title = (%s) AND (message_type = %s) AND (source_type = %s)  OR (source_type = all)' % \
-                              (user_message, event.type, event.source.type)
-                search_list = self.components.search('auto_ix_LineBotModel', keyword)
+                              (user_message, event.message.type, event.source.type)
+            else:
+                if event.type == 'postback':
+                    keyword = event.postback.data
+                    keyword = u'title = (%s) AND (message_type = %s) AND (source_type = %s)' % (keyword, event.type, event.source.type)
+            search_list = self.components.search('auto_ix_LineBotModel', keyword, sort_field='weights',
+                                                 sort_direction='desc', sort_default_value=0.0001)
             if search_list and len(search_list) > 0:
                 search_item = search_list[0]
-            if search_item is None and start_event is False:
-                continue
-            self.logging.info(search_item)
             line_body = body
             line_event = event
             return_message_type = u'TextSendMessage'
             if search_item is not None:
+                self.logging.info(search_item)
                 return_message_type = search_item.return_message_type
+                search_item.weights += 1
+                search_item.put()
                 exec search_item.py_code
+            else:
+                return_text = config.unknown_message
             if return_message_type == u'TextSendMessage':
                 if return_text and not return_text.strip() == u'':
                     reply_message = TextSendMessage(
@@ -120,8 +106,6 @@ class LineBot(Controller):
                         alt_text=return_alt_text,
                         template=return_template
                     )
-            if start_event and reply_message is None and return_text and not return_text.strip() == u'':
-                reply_message = TextSendMessage(text=return_text)
             if reply_message:
                 line_bot_api.reply_message(event.reply_token, reply_message)
         return 'OK'
