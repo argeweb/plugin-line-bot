@@ -10,6 +10,13 @@ from argeweb import BasicModel
 from argeweb import Fields
 
 
+def learn(keyword, message, weights=1):
+    item = LineBotModel()
+    item.title = keyword
+    item.py_code = 'return_text = u"""%s"""' % message
+    item.weights = weights
+    item.put()
+
 class LineBotModel(BasicModel):
     name = Fields.HiddenProperty(verbose_name=u'識別名稱')
     title = Fields.TextProperty(verbose_name=u'檢查的字串', default=u'')
@@ -18,6 +25,7 @@ class LineBotModel(BasicModel):
         u'user',
         u'group',
         u'room',
+        u'input',
         u'all',
     ))
     message_type = Fields.StringProperty(verbose_name=u'要處理的訊息類型', default=u'text', choices=(

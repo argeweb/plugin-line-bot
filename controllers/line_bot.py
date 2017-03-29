@@ -17,6 +17,7 @@ from argeweb.libs import requests
 from argeweb.libs.bs4 import BeautifulSoup
 from ..models.line_bot_config_model import LineBotConfigModel
 from ..models.line_bot_input_model import LineBotInputModel, wait_input
+from ..models.line_bot_model import learn
 from ..libs.linebot import LineBotApi, WebhookParser
 from ..libs.linebot.exceptions import InvalidSignatureError
 from ..libs.linebot.models import *
@@ -59,14 +60,15 @@ class LineBot(Controller):
             return_template = None
             return_alt_text = None
             reply_message = None
+            input_item = None
             keyword = ''
             if event.type == 'message':
                 user_message = event.message.text
                 input_item = LineBotInputModel.find_by_name(event.source.sender_id)
                 if input_item:
+                    input_item.need_delete = True
                     keyword = u'title = (%s) AND (message_type = %s) AND (source_type = input)' % \
                               (input_item.next_step, event.message.type)
-                    input_item.key.delete()
                 else:
                     keyword = u'title = (%s) AND (message_type = %s) AND (source_type = %s)  OR (source_type = all)' % \
                               (user_message, event.message.type, event.source.type)
@@ -74,6 +76,7 @@ class LineBot(Controller):
                 if event.type == 'postback':
                     keyword = event.postback.data
                     keyword = u'title = (%s) AND (message_type = %s) AND (source_type = %s)' % (keyword, event.type, event.source.type)
+            self.logging.info(keyword)
             search_list = self.components.search('auto_ix_LineBotModel', keyword, sort_field='weights',
                                                  sort_direction='desc', sort_default_value=0.0001)
             if search_list and len(search_list) > 0:
@@ -89,6 +92,9 @@ class LineBot(Controller):
                 exec search_item.py_code
             else:
                 return_text = config.unknown_message
+            if input_item is not None:
+                if input_item.need_delete is True:
+                    input_item.key.delete()
             if return_message_type == u'TextSendMessage':
                 if return_text and not return_text.strip() == u'':
                     reply_message = TextSendMessage(

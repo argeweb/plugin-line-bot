@@ -16,12 +16,3 @@ class LineBotConfigModel(BasicModel):
     channel_secret = Fields.StringProperty(verbose_name=u'channel_secret', default=u'')
     channel_access_token = Fields.StringProperty(verbose_name=u'channel_access_token', default=u'')
     unknown_message = Fields.StringProperty(verbose_name=u'無法判斷時', default=u'')
-
-    @classmethod
-    def find_or_create_by_name(cls, name):
-        item = cls.find_by_name(name)
-        if item is None:
-            item = cls()
-            item.name = name
-            item.put()
-        return item
