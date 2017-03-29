@@ -13,7 +13,7 @@
 
 <a href="https://line.me/R/ti/p/@kpn6654y">https://line.me/R/ti/p/@kpn6654y</a>
 
-<img src="http://imgur.com/a/2nRi7">
+<img src="http://i.imgur.com/Wip0nfm.png">
 
 
 
