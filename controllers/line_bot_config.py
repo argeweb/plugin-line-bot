@@ -12,9 +12,6 @@ from argeweb.components.search import Search
 
 
 class LineBotConfig(Controller):
-    class Meta:
-        components = (scaffold.Scaffolding, Pagination, Search)
-
     @route
     @route_menu(list_name=u'backend', text=u'Line Bot 設定', sort=802, group=u'互動項目')
     def admin_config(self):

@@ -24,9 +24,6 @@ from ..libs.linebot.models import *
 
 
 class LineBot(Controller):
-    class Meta:
-        components = (scaffold.Scaffolding, Pagination, Search)
-
     class Scaffold:
         display_in_list = ['title', 'source_type', 'message_type', 'return_message_type', 'py_code', 'weights']
 
