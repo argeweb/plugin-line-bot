@@ -6,18 +6,10 @@
 # Web: http://www.yooliang.com/
 # Date: 2017/3/11
 
-import datetime
-from google.appengine.api import namespace_manager
-from google.appengine.api import memcache
 from argeweb import Controller, scaffold
 from argeweb import route_with, route_menu, route
-from argeweb.components.pagination import Pagination
-from argeweb.components.search import Search
-from argeweb.libs import requests
-from argeweb.libs.bs4 import BeautifulSoup
-from ..models.line_bot_config_model import LineBotConfigModel
-from ..models.line_bot_input_model import LineBotInputModel, wait_input
-from ..models.line_bot_model import learn
+from ..models.config_model import ConfigModel
+from ..models.line_bot_input_model import LineBotInputModel
 from ..libs.linebot import LineBotApi, WebhookParser
 from ..libs.linebot.exceptions import InvalidSignatureError
 from ..libs.linebot.models import *
@@ -28,14 +20,14 @@ class LineBot(Controller):
         display_in_list = ['title', 'source_type', 'message_type', 'return_message_type', 'py_code', 'weights']
 
     @route
-    @route_menu(list_name=u'backend', text=u'Line Bot 訊息', sort=801, group=u'互動項目')
+    @route_menu(list_name=u'backend', group=u'互動項目', text=u'Line Bot 訊息', sort=801)
     def admin_list(self):
         return scaffold.list(self)
 
     @route
-    @route_menu(list_name=u'backend', text=u'Line callback Test', sort=803, group=u'互動項目')
+    @route_menu(list_name=u'backend', group=u'互動項目', text=u'Line callback Test', sort=803)
     def callback(self):
-        config = LineBotConfigModel.find_or_create_by_name(self.namespace)
+        config = ConfigModel.get_or_create_by_name(self.namespace)
         line_bot_api = LineBotApi(config.channel_access_token)
         parser = WebhookParser(config.channel_secret)
         signature = self.request.headers['X-Line-Signature']
@@ -61,7 +53,7 @@ class LineBot(Controller):
             keyword = ''
             if event.type == 'message':
                 user_message = event.message.text
-                input_item = LineBotInputModel.find_by_name(event.source.sender_id)
+                input_item = LineBotInputModel.get_by_name(event.source.sender_id)
                 if input_item:
                     input_item.need_delete = True
                     keyword = u'title = (%s) AND (message_type = %s) AND (source_type = input)' % \

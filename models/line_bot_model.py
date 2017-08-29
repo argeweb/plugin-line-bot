@@ -18,7 +18,6 @@ def learn(keyword, message, weights=1):
     item.put()
 
 class LineBotModel(BasicModel):
-    name = Fields.HiddenProperty(verbose_name=u'識別名稱')
     title = Fields.TextProperty(verbose_name=u'檢查的字串', default=u'')
     py_code = Fields.TextProperty(verbose_name=u'PyCode', default=u'')
     source_type = Fields.StringProperty(verbose_name=u'要處理的訊息來源', default=u'user', choices=(
@@ -49,8 +48,8 @@ class LineBotModel(BasicModel):
     weights = Fields.FloatProperty(verbose_name=u'權重', default=0.0)
 
     @classmethod
-    def find_or_create_by_name(cls, name):
-        item = cls.find_by_name(name)
+    def get_or_create_by_name(cls, name):
+        item = cls.get_by_name(name)
         if item is None:
             import time
             item = cls()

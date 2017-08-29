@@ -1,6 +1,4 @@
-{% extends "backend/config.html" %}
-{% block layout_before_content %}
-<div class="ibox-content m-b-sm border-bottom">
+<div class="ibox-content m-b-sm border-bottom page-big-header">
     <div class="p-xs">
         <div class="pull-left m-r-md">
             <i class="material-icons mid-icon brand-text-color">memory</i>
@@ -11,4 +9,3 @@
         {% if last_record_date %}<span class="text-muted small pull-right visible-sm visible-md visible-lg">最後更新：<i class="icon">access_time</i> {{ print_value(last_record_date) }}</span>{% endif %}
     </div>
 </div>
-{% endblock %}
