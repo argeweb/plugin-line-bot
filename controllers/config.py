@@ -13,5 +13,5 @@ class Config(Controller):
     @route
     @route_menu(list_name=u'backend', group=u'互動項目', text=u'Line Bot 設定', sort=802)
     def admin_config(self):
-        config_record = self.meta.Model.get_or_create_by_name('line_bot')
+        config_record = self.meta.Model.get_config()
         return scaffold.edit(self, config_record.key)

@@ -19,7 +19,6 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
 
 from argeweb.libs.six import with_metaclass
-from google.appengine.api import urlfetch
 
 
 class HttpClient(with_metaclass(ABCMeta)):
@@ -107,7 +106,6 @@ class RequestsHttpClient(HttpClient):
         """
         if timeout is None:
             timeout = self.timeout
-        from argeweb.libs import requests
 
         from google.appengine.api import urlfetch
         result = urlfetch.fetch(url, params, "get", headers)

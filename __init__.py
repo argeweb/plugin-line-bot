@@ -7,6 +7,23 @@
 # Date: 2017/3/11
 from argeweb import ViewDatastore
 from argeweb import ViewFunction
+from argeweb.core.events import on
+from .libs.linebot.models import TextSendMessage
+from .libs.linebot import LineBotApi, WebhookParser
+from .models.line_bot_model import LineBotModel
+from .models.config_model import ConfigModel
+
+
+@on('send_line_push_message')
+def send_line_push_message(controller, message, to, *args, **kwargs):
+    config = ConfigModel.get_config()
+    line_bot_api = LineBotApi(config.channel_access_token)
+    # parser = WebhookParser(config.channel_secret)
+    text_message = TextSendMessage(
+        text=message
+    )
+    line_bot_api.push_message(to, text_message)
+    return
 
 
 plugins_helper = {
